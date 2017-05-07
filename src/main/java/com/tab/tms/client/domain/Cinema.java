@@ -9,33 +9,42 @@ import javax.persistence.Id;
 import java.util.Date;
 
 /**
- *
+ * 影院信息表
+ * <p>
  * Created by tab on 5/1/17.
  */
 @Entity
-public class RegisterInfo {
+public class Cinema {
+
     @Id
     @GeneratedValue
     private Integer id;
+
     // 影院编码
     private Integer cinemaNumber;
+
     // 影院名称
     private String cinemaName;
+
     // CPU序列号
     private String CPUSerial;
+
     // MAC地址
-    private Integer MACAddress;
+    private String MACAddress;
+
     // 授权开始时间
-    private Date BeforeExpiredDate;
+    private Date beforeExpiredDate;
+
     // 授权结束时间
-    private Date AfterExpiredDate;
+    private Date afterExpiredDate;
+
     @CreationTimestamp
     private Date createTime;
-    @UpdateTimestamp
-    private Date UpdateTime;
-    private boolean isDelete;
 
-    public RegisterInfo(){
+    @UpdateTimestamp
+    private Date updateTime;
+
+    public Cinema() {
     }
 
     public Integer getId() {
@@ -54,28 +63,28 @@ public class RegisterInfo {
         this.CPUSerial = CPUSerial;
     }
 
-    public Integer getMACAddress() {
+    public String getMACAddress() {
         return MACAddress;
     }
 
-    public void setMACAddress(Integer MACAddress) {
+    public void setMACAddress(String MACAddress) {
         this.MACAddress = MACAddress;
     }
 
     public Date getBeforeExpiredDate() {
-        return BeforeExpiredDate;
+        return beforeExpiredDate;
     }
 
     public void setBeforeExpiredDate(Date beforeExpiredDate) {
-        BeforeExpiredDate = beforeExpiredDate;
+        this.beforeExpiredDate = beforeExpiredDate;
     }
 
     public Date getAfterExpiredDate() {
-        return AfterExpiredDate;
+        return afterExpiredDate;
     }
 
     public void setAfterExpiredDate(Date afterExpiredDate) {
-        AfterExpiredDate = afterExpiredDate;
+        this.afterExpiredDate = afterExpiredDate;
     }
 
     public Date getCreateTime() {
@@ -87,19 +96,11 @@ public class RegisterInfo {
     }
 
     public Date getUpdateTime() {
-        return UpdateTime;
+        return updateTime;
     }
 
     public void setUpdateTime(Date updateTime) {
-        UpdateTime = updateTime;
-    }
-
-    public boolean isDelete() {
-        return isDelete;
-    }
-
-    public void setDelete(boolean delete) {
-        isDelete = delete;
+        this.updateTime = updateTime;
     }
 
     public Integer getCinemaNumber() {

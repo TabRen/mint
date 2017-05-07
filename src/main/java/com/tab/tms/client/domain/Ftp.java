@@ -9,28 +9,34 @@ import javax.persistence.Id;
 import java.util.Date;
 
 /**
- * 用户信息表
+ * FTP信息表
  * <p>
- * Created by tab on 5/1/17.
+ * Created by tab on 5/6/17.
  */
 @Entity
-public class User {
+public class Ftp {
 
     @Id
     @GeneratedValue
     private Integer id;
 
-    private String userName;
+    private String ip;
+
+    private Integer port;
+
+    private String username;
 
     private String password;
+
+    private String path;
 
     @CreationTimestamp
     private Date createTime;
 
     @UpdateTimestamp
-    private Date UpdateTime;
+    private Date updateTime;
 
-    public User() {
+    public Ftp() {
     }
 
     public Integer getId() {
@@ -41,12 +47,28 @@ public class User {
         this.id = id;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getIp() {
+        return ip;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public Integer getPort() {
+        return port;
+    }
+
+    public void setPort(Integer port) {
+        this.port = port;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
@@ -55,6 +77,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public Date getCreateTime() {
@@ -66,11 +96,10 @@ public class User {
     }
 
     public Date getUpdateTime() {
-        return UpdateTime;
+        return updateTime;
     }
 
     public void setUpdateTime(Date updateTime) {
-        UpdateTime = updateTime;
+        this.updateTime = updateTime;
     }
-
 }

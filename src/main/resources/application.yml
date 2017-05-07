@@ -3,7 +3,7 @@ spring:
     active: dev
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/mint_db
+    url: jdbc:mysql://127.0.0.1:3306/mint
     username: root
     password: PythA90ra5
   jpa:

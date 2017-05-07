@@ -9,39 +9,51 @@ import javax.persistence.Id;
 import java.util.Date;
 
 /**
+ * 厅信息表
+ *
  * Created by tab on 5/1/17.
  */
 @Entity
 public class Hall {
+
     @Id
     @GeneratedValue
     private Integer id;
+
     // 影厅编号
     private Integer hallNumber;
+
     // 影厅名称
     private String hallName;
+
     // 服务器类型
     private String serverType;
+
     // 主服务器IP
     private String serverMasterIP;
+
     // 从服务器IP
     private String serverSlaveIP;
+
     // 主放映机IP
     private String projectorMasterIP;
+
     // 从放映机IP
     private String projectorSlaveIP;
+
     // 解码器IP
     private String processorIP;
+
     // 自动化控制器IP
     private String automationIP;
+
     @CreationTimestamp
     private Date createTime;
+
     @UpdateTimestamp
     private Date UpdateTime;
-    private boolean isDelete;
 
     public Hall() {
-
     }
 
     public Integer getId() {
@@ -140,11 +152,4 @@ public class Hall {
         UpdateTime = updateTime;
     }
 
-    public boolean isDelete() {
-        return isDelete;
-    }
-
-    public void setDelete(boolean delete) {
-        isDelete = delete;
-    }
 }
