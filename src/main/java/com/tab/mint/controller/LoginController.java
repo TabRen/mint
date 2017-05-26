@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 public class LoginController {
-    @RequestMapping(value = "/test")
+    @RequestMapping(value = "/login")
     private String login() {
-        return "test";
+        return "login";
     }
 
 }
