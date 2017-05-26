@@ -1,4 +1,8 @@
 spring:
+#  thymeleaf:
+#    prefix: classpath:/templates/
+#    suffix: .html
+#    cache: false
   profiles:
     active: dev
   datasource:
@@ -10,3 +14,8 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+#server:
+#  tomcat:
+#    accesslog:
+#      enabled: true
+##    basedir: target/tomcat

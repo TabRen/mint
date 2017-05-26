@@ -4,17 +4,23 @@ import com.tab.mint.device.sms.SMS;
 import com.tab.mint.device.sms.SMSUtils.CPL.CPL;
 import com.tab.mint.device.sms.SMSUtils.GetPublicKeyUtil;
 import com.tab.mint.device.sms.SMSUtils.Ingestion.Ingestion;
+import com.tab.mint.device.sms.SMSUtils.KDM.AuthenticatedPublic;
 import com.tab.mint.device.sms.SMSUtils.KDM.KDM;
+import com.tab.mint.device.sms.SMSUtils.KDM.KDMRequiredExtensions;
+import com.tab.mint.device.sms.SMSUtils.KDM.RequiredExtensions;
 import com.tab.mint.device.sms.SMSUtils.PlaybackStatus.PlaybackStatus;
 import com.tab.mint.device.sms.SMSUtils.SMSInfo.SMSInfo;
-import com.tab.mint.device.sms.SMSUtils.SPL.SPL;
+import com.tab.mint.device.sms.SMSUtils.SPL.*;
 import com.tab.mint.device.sms.SMSUtils.Schedule.Schedule;
 import com.tab.mint.device.sms.SMSUtils.StorageInfo.StorageInfo;
 import com.tab.mint.device.sms.SMSUtils.XMLResponseUtil;
+import com.tab.mint.enums.MintEnum;
 import com.tab.mint.enums.SMSEnum;
+import com.tab.mint.exception.MintException;
 import com.tab.mint.exception.device.SMSException;
 import com.tab.mint.utils.CheckConnectionUtil;
 import org.crifst.project.tms.smi.barco.api.*;
+import org.dom4j.*;
 import org.dom4j.tree.DefaultElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,10 +71,10 @@ public class BarcoSMS implements SMS {
                 XMLResponseUtil xmlResponseUtil = new XMLResponseUtil(xml);
                 String status = xmlResponseUtil.getResponsesStatus();
                 if ("OK".equals(status)) {
-//                    xml = xmlResponseUtil.getXMLEltStrValue();
-//                    CPL cpl = new CPL();
-//                    cpl.setId(xmlResponseUtil.getXPathValue(xml,"//Id"));
-                    return xmlResponseUtil.getCPL();
+                    //xml = xmlResponseUtil.getXMLEltStrValue();
+                    //CPL cpl = new CPL();
+                    //cpl.setId(xmlResponseUtil.getXPathValue(xml,"//Id"));
+                    return getCPL(xmlResponseUtil);
                 }
             } catch (Exception e) {
                 logger.error("BarcoSMS getCPL occur exception: ", e);
@@ -125,7 +131,7 @@ public class BarcoSMS implements SMS {
                 XMLResponseUtil xmlResponseUtil = new XMLResponseUtil(xml);
                 String status = xmlResponseUtil.getResponsesStatus();
                 if ("OK".equals(status)) {
-                    return xmlResponseUtil.parseSPLXML(xmlResponseUtil.getXMLEltStrValue());
+                    return getSPL(xmlResponseUtil);
                 }
             } catch (Exception e) {
                 logger.error("BarcoSMS getSPL occur exception: ", e);
@@ -319,7 +325,7 @@ public class BarcoSMS implements SMS {
                 XMLResponseUtil xmlResponseUtil = new XMLResponseUtil(xml);
                 String status = xmlResponseUtil.getResponsesStatus();
                 if ("OK".equals(status)) {
-                    return xmlResponseUtil.getKDM();
+                    return getKDM(xmlResponseUtil);
                 }
             } catch (Exception e) {
                 logger.error("BarcoSMS getKDM occur exception: ", e);
@@ -828,6 +834,164 @@ public class BarcoSMS implements SMS {
             } catch (Exception e) {
                 logger.error("BarcoSMS getScheduleList occur exception: ", e);
                 throw new SMSException(SMSEnum.INTERMAL_ERROR);
+            }
+        }
+        return null;
+    }
+
+    // 获取CPL
+    private CPL getCPL(XMLResponseUtil xmlResponseUtil) {
+        if (xmlResponseUtil.getXMLEltStrValue() != null) {
+            try {
+                Document document = DocumentHelper.parseText(xmlResponseUtil.getXMLEltStrValue());
+                CPL cpl = new CPL();
+                cpl.setId(document.getRootElement().element("Id").getStringValue());
+                cpl.setAnnotationText(
+                    document.getRootElement().element("AnnotationText").getStringValue());
+                cpl.setIssueDate(document.getRootElement().element("IssueDate").getStringValue());
+                cpl.setIssuer(document.getRootElement().element("Issuer").getStringValue());
+                cpl.setCreator(document.getRootElement().element("Creator").getStringValue());
+                cpl.setContentTitleText(
+                    document.getRootElement().element("ContentTitleText").getStringValue());
+                cpl.setContentKind(
+                    document.getRootElement().element("ContentKind").getStringValue());
+                return cpl;
+            } catch (DocumentException e) {
+                logger.error("XMLResponseUtil getCPL occur exception: ", e);
+                throw new MintException(MintEnum.PARSE_XML_ERROR);
+            }
+        }
+        return null;
+    }
+
+    // 解析SPLXml
+    private SPL getSPL(XMLResponseUtil xmlResponseUtil) {
+        String xml = xmlResponseUtil.getXMLEltStrValue();
+        if ((null == xml) || xml.isEmpty())
+            return null;
+        Document document;
+        try {
+            document = DocumentHelper.parseText(xml);
+        } catch (DocumentException e) {
+            logger.error("BarcoSMS parseSPL occur exception: ", e);
+            throw new MintException(MintEnum.PARSE_XML_ERROR);
+        }
+
+        SPL spl = new SPL();
+        spl.setUuid(document.getRootElement().element("Id").getStringValue());
+        spl.setContentTitleText(
+            document.getRootElement().element("ContentTitleText").getStringValue());
+        spl.setAnnotationText(document.getRootElement().element("AnnotationText").getStringValue());
+        spl.setIssuer(document.getRootElement().element("Issuer").getStringValue());
+        spl.setIssueDate(document.getRootElement().element("IssueDate").getStringValue());
+        spl.setCreator(document.getRootElement().element("Creator").getStringValue());
+        // 使用XPath方式解析
+        // 获取根结点<ShowPlaylist>
+        Node rootNode = document.selectSingleNode("ShowPlaylist");
+        List clipLists = rootNode.selectNodes("ClipList");
+        if (!clipLists.isEmpty()) {
+            List<ClipList> list1 = new ArrayList<>();
+            for (Object obj1 : clipLists) {
+                ClipList clipList = new ClipList();
+                Node node1 = (Node) obj1;
+                List clips = node1.selectNodes("Clip");
+                if (!clips.isEmpty()) {
+                    List<Clip> list2 = new ArrayList<>();
+                    for (Object obj2 : clips) {
+                        Clip clip = new Clip();
+                        Node node2 = (Node) obj2;
+                        clip.setType(node2.selectSingleNode("Type").getStringValue());
+                        clip.setId(node2.selectSingleNode("Id").getStringValue());
+                        clip.setContentTitleText(
+                            node2.selectSingleNode("ContentTitleText").getStringValue());
+                        clip.setDurationInMilliseconds(
+                            node2.selectSingleNode("DurationInMilliseconds").getStringValue());
+                        clip.setContentKind(node2.selectSingleNode("ContentKind").getStringValue());
+                        List cueLists = node2.selectNodes("CueList");
+                        if (!cueLists.isEmpty()) {
+                            List<CueList> list3 = new ArrayList<>();
+                            for (Object obj3 : cueLists) {
+                                CueList cueList = new CueList();
+                                Node node3 = (Node) obj3;
+                                List cues = node3.selectNodes("Cue");
+                                if (!cues.isEmpty()) {
+                                    List<Cue> list4 = new ArrayList<>();
+                                    for (Object obj4 : cues) {
+                                        Cue cue = new Cue();
+                                        Node node4 = (Node) obj4;
+                                        cue.setName(
+                                            node4.selectSingleNode("Name").getStringValue());
+                                        cue.setOffsetInMilliseconds(
+                                            node4.selectSingleNode("OffsetInMilliseconds")
+                                                .getStringValue());
+                                        list4.add(cue);
+                                    }
+                                    cueList.setCue(list4);
+                                }
+                                list3.add(cueList);
+                            }
+                            clip.setCueList(list3);
+                        }
+                        list2.add(clip);
+                    }
+                    clipList.setClip(list2);
+                }
+                list1.add(clipList);
+            }
+            spl.setClipList(list1);
+        }
+        return spl;
+    }
+
+    // 获取KDM
+    private KDM getKDM(XMLResponseUtil xmlResponseUtil) {
+        if (xmlResponseUtil.getXMLEltStrValue() != null) {
+            try {
+                KDM kdm = new KDM();
+                Document document = DocumentHelper.parseText(xmlResponseUtil.getXMLEltStrValue());
+                Element authenticatedPublicElt =
+                    document.getRootElement().element("AuthenticatedPublic");
+                if (authenticatedPublicElt != null) {
+                    AuthenticatedPublic authenticatedPublic = new AuthenticatedPublic();
+                    authenticatedPublic
+                        .setMessageId(authenticatedPublicElt.element("MessageId").getStringValue());
+                    authenticatedPublic.setMessageType(
+                        authenticatedPublicElt.element("MessageType").getStringValue());
+                    authenticatedPublic.setAnnotationText(
+                        authenticatedPublicElt.element("AnnotationText").getStringValue());
+                    authenticatedPublic
+                        .setIssueDate(authenticatedPublicElt.element("IssueDate").getStringValue());
+                    Element equiredExtensionsElt =
+                        authenticatedPublicElt.element("RequiredExtensions");
+                    if (equiredExtensionsElt != null) {
+                        RequiredExtensions requiredExtensions = new RequiredExtensions();
+                        Element KDMRequiredExtensionsElt =
+                            equiredExtensionsElt.element("KDMRequiredExtensions");
+                        if (KDMRequiredExtensionsElt != null) {
+                            KDMRequiredExtensions kdmRequiredExtensions =
+                                new KDMRequiredExtensions();
+                            kdmRequiredExtensions.setCompositionPlaylistId(
+                                KDMRequiredExtensionsElt.element("CompositionPlaylistId")
+                                    .getStringValue());
+                            kdmRequiredExtensions.setContentTitleText(
+                                KDMRequiredExtensionsElt.element("ContentTitleText")
+                                    .getStringValue());
+                            kdmRequiredExtensions.setContentKeysNotValidBefore(
+                                KDMRequiredExtensionsElt.element("ContentKeysNotValidBefore")
+                                    .getStringValue());
+                            kdmRequiredExtensions.setContentKeysNotValidAfter(
+                                KDMRequiredExtensionsElt.element("ContentKeysNotValidAfter")
+                                    .getStringValue());
+                            requiredExtensions.setKDMRequiredExtensions(kdmRequiredExtensions);
+                        }
+                        authenticatedPublic.setRequiredExtensions(requiredExtensions);
+                    }
+                    kdm.setAuthenticatedPublic(authenticatedPublic);
+                    return kdm;
+                }
+            } catch (DocumentException e) {
+                logger.error("XMLResponseUtil getKDM occur exception: ", e);
+                throw new MintException(MintEnum.PARSE_XML_ERROR);
             }
         }
         return null;
