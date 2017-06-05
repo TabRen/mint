@@ -10,9 +10,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 public class LoginController {
-    @RequestMapping(value = "/login")
-    private String login() {
-        return "login";
-    }
+  // 登录页面
+  @RequestMapping(value = "/login")
+  private String login() {
+    return "login";
+  }
+
+  // 登入后跳转
+  @RequestMapping(value = "/")
+  private String loginPass() {
+    return "screen";
+  }
 
 }

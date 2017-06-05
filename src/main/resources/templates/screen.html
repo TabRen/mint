@@ -2,12 +2,15 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title>Mint TMS Login</title>
+    <title>Mint TMS</title>
     <link th:href="@{bootstrap/css/bootstrap.min.css}" rel="stylesheet"/>
     <link th:href="@{bootstrap/css/bootstrap-theme.min.css}" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" th:href="@{Login.css}"/>
+    <script th:src="@{bootstrap/js/bootstrap.min.js}"></script>
 </head>
 <body>
-<script th:src="@{bootstrap/js/bootstrap.min.js}"></script>
-<button type="button" class="btn btn-primary">按钮</button>
+<form th:action="@{/logout}" method="post">
+    <button type="submit" class="btn btn-primary">注销</button>
+</form>
 </body>
 </html>
