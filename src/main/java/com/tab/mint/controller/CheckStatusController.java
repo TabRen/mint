@@ -13,6 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class CheckStatusController {
     @RequestMapping(value = "/checkStatus", method = RequestMethod.GET)
     private String checkStatus() {
-        return "Mint is running";
+        return "Mint TMS is running";
     }
 }

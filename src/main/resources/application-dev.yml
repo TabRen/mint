@@ -1,2 +1,8 @@
+spring:
+  thymeleaf:
+    #开发时关闭缓存,不然没法看到实时页面
+    # Allow Thymeleaf templates to be reloaded at dev time
+    cache: false
+
 server:
   port: 12579

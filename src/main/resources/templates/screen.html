@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
     <title>Mint TMS</title>
@@ -9,8 +9,14 @@
     <script th:src="@{bootstrap/js/bootstrap.min.js}"></script>
 </head>
 <body>
+<!--<input type="text" name="userName" value="James Carrot" th:value="${user.name}"/>-->
+
+<!--<input type=“submit” value=“Subscribe&nbsp;me!” th:attr=“value=#{submit}”/>-->
+<!--<input type=“submit” value=“Subscribe&nbsp;me!” th:value=“#{submit}”/>-->
+
+<!--<img src=“logo.png” th:attr=“title=#{logo},alt=#{logo}” >-->
 <form th:action="@{/logout}" method="post">
-    <button type="submit" class="btn btn-primary">注销</button>
+    <button class="btn btn-primary">注销</button>
 </form>
 </body>
 </html>

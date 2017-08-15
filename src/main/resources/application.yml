@@ -1,8 +1,8 @@
 spring:
-#  thymeleaf:
-#    prefix: classpath:/templates/
-#    suffix: .html
-#    cache: false
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
   profiles:
     active: dev
   datasource:
